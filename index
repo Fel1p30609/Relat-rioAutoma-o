@@ -6,7 +6,7 @@
     <title>Relatório Dinâmico - XTRADERS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --background: #010409;
@@ -17,7 +17,8 @@
             --text-primary: #e6edf3;
             --text-secondary: #848d97;
             --border-color: #30363d;
-            --font-family: 'Inter', sans-serif;
+            --font-family-primary: 'Inter', sans-serif;
+            --font-family-secondary: 'Orbitron', sans-serif; /* Nova fonte para títulos */
             --border-radius: 16px;
         }
 
@@ -30,146 +31,169 @@
         body {
             background-color: var(--background);
             color: var(--text-primary);
-            font-family: var(--font-family);
+            font-family: var(--font-family-primary);
             padding: 20px;
             display: flex;
-            justify-content: center; /* Centraliza o report-wrapper horizontalmente no body */
-            align-items: center;     /* Centraliza o report-wrapper verticalmente no body */
-            min-height: 100vh;       /* Garante que o body ocupe a altura total da viewport */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden; /* Previne scroll horizontal */
         }
+
+        /* Efeito de blur de fundo com sombra verde */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%; /* Centraliza o gradiente verticalmente */
+            left: 50%; /* Centraliza o gradiente horizontalmente */
+            transform: translate(-50%, -50%); /* Ajusta para centralizar perfeitamente */
+            width: 120vw; /* Aumenta a largura para cobrir mais a tela */
+            height: 120vh; /* Aumenta a altura para cobrir mais a tela */
+            background: radial-gradient(circle at center, rgba(45, 255, 53, 0.15) 0%, rgba(1, 4, 9, 0) 60%); /* Mais intenso no centro, transparente nas bordas */
+            filter: blur(150px); /* Aumenta o blur para um efeito mais suave e difuso */
+            z-index: -1;
+            opacity: 1; /* Garante opacidade total para o efeito ser visível */
+        }
+
 
         .report-wrapper {
             width: 100%;
             max-width: 1400px;
             display: flex;
             gap: 40px;
-            transition: all 0.5s ease-in-out; /* Transição suave para o layout */
-            margin: 0 auto; /* Centraliza o wrapper principal horizontalmente */
+            transition: all 0.5s ease-in-out;
+            margin: 0 auto;
         }
 
         /* --- ESTADO INICIAL (Antes de carregar o relatório) --- */
         .report-wrapper.initial-state {
-            flex-direction: column; /* Organiza os elementos da sidebar em coluna */
-            justify-content: center; /* Centraliza verticalmente a sidebar DENTRO do wrapper */
-            align-items: center; /* Centraliza horizontalmente a sidebar DENTRO do wrapper */
-            min-height: calc(100vh - 40px); /* Garante que o wrapper ocupe a maior parte da tela para centralizar */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 40px);
         }
 
         .report-wrapper.initial-state .sidebar {
-            position: static; /* Remove sticky no estado inicial */
-            width: 300px; /* Largura fixa para a sidebar */
-            max-width: 100%; /* Garante responsividade */
-            display: flex; /* Torna a sidebar um flex container */
-            flex-direction: column; /* Empilha os itens da sidebar verticalmente */
-            align-items: center; /* CENTRALIZA O CONTEÚDO DA SIDEBAR HORIZONTALMENTE */
-            gap: 20px; /* Espaçamento entre os itens da sidebar */
+            position: static;
+            width: 300px;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
         .report-wrapper.initial-state .main-content {
-            display: none; /* Esconde o conteúdo principal no estado inicial */
+            display: none;
         }
         .report-wrapper.initial-state .logo {
-            display: flex; /* Torna o contêiner do logo um flexbox */
-            justify-content: center; /* Centraliza a imagem do logo dentro */
-            width: 100%; /* Ocupa a largura total para centralizar */
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
         .report-wrapper.initial-state .logo img {
-            width: 200px; /* Logo maior no estado inicial */
+            width: 200px;
             height: auto;
-            margin-bottom: 0; /* Gerenciado pelo gap do sidebar */
+            margin-bottom: 0;
         }
         .report-wrapper.initial-state .report-summary {
             width: 100%;
-            text-align: center; /* Centraliza o texto dentro do resumo */
+            text-align: center;
         }
         .report-wrapper.initial-state .report-summary .daily-result {
-            margin: 0 auto; /* Centraliza o daily-result */
-            width: fit-content; /* Permite que o daily-result se ajuste ao conteúdo e seja centralizado */
+            margin: 0 auto;
+            width: fit-content;
         }
         .report-wrapper.initial-state .upload-section {
-            display: flex; /* Torna a seção de upload um flexbox */
-            justify-content: center; /* Centraliza o botão dentro da seção */
-            width: 100%; /* Ocupa a largura total para centralizar */
-            margin-top: 0; /* Gerenciado pelo gap do sidebar */
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: 0;
         }
-
 
         /* --- ESTADO PÓS-CARREGAMENTO (Relatório carregado) --- */
-
-        /* Ajusta o wrapper para alinhar a sidebar à esquerda e o main-content à direita */
         .report-wrapper:not(.initial-state) {
-            justify-content: flex-start; /* Alinha a sidebar à esquerda */
-            align-items: flex-start;     /* Alinha a sidebar e main-content ao topo */
-            flex-direction: row;         /* Garante que fiquem lado a lado (padrão) */
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-direction: row;
         }
 
-        /* Sidebar no estado pós-carregamento */
         .sidebar {
             display: flex;
             flex-direction: column;
-            gap: 40px; /* Espaçamento padrão para o estado pós-carregamento */
-            flex-basis: 300px; /* Largura fixa para a sidebar */
+            gap: 40px;
+            flex-basis: 300px;
             flex-shrink: 0;
-            position: sticky; /* Mantém a sidebar fixa na rolagem */
+            position: sticky;
             top: 20px;
-            transition: all 0.5s ease-in-out; /* Transição suave */
-
-            /* Alinhamento para o estado pós-carregamento */
-            align-items: center; /* <<< MUDANÇA AQUI: Centraliza o conteúdo da sidebar */
-            text-align: center;  /* <<< MUDANÇA AQUI: Centraliza o texto da sidebar */
+            transition: all 0.5s ease-in-out;
+            align-items: center;
+            text-align: center;
             margin: 0;
         }
 
-        /* Logo no estado pós-carregamento */
         .logo {
             display: flex;
-            justify-content: center; /* <<< MUDANÇA AQUI: Centraliza a logo */
-            width: 100%; /* Garante que o contêiner do logo ocupe a largura total */
+            justify-content: center;
+            width: 100%;
         }
         .logo img {
-            width: 150px; /* Logo menor após o envio */
+            width: 150px;
             height: auto;
             margin-bottom: 0;
         }
 
-        /* Resumo do relatório no estado pós-carregamento */
         .report-summary {
             background-color: var(--surface);
             border: 3px solid var(--border-color);
             border-radius: var(--border-radius);
             padding: 30px;
             transition: border-color 0.3s ease;
-            width: 100%; /* Ocupa a largura total da sidebar */
-            text-align: center; /* <<< MUDANÇA AQUI: Centraliza o texto do resumo */
+            width: 100%;
+            text-align: center;
         }
         .report-summary.positive { border-color: var(--green); }
         .report-summary.negative { border-color: var(--red); }
 
-        .report-summary h2 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
-        .report-summary .date { font-size: 20px; font-weight: 500; margin-bottom: 25px; }
+        .report-summary h2 {
+            font-family: var(--font-family-secondary); /* Aplica a fonte Orbitron */
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary); /* Cor do texto */
+        }
+        .report-summary .date {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 25px;
+            color: var(--text-secondary); /* Cor do texto secundário */
+        }
 
         .report-summary .daily-result {
             border: 2px solid var(--border-color);
             border-radius: var(--border-radius);
             padding: 15px;
             transition: border-color 0.3s ease;
-            width: fit-content; /* Permite que a div se ajuste ao conteúdo */
-            margin: 0 auto; /* <<< MUDANÇA AQUI: Centraliza o daily-result */
-            text-align: center; /* <<< MUDANÇA AQUI: Centraliza o texto do daily-result */
+            width: fit-content;
+            margin: 0 auto;
+            text-align: center;
         }
         .report-summary.positive .daily-result { border-color: var(--green); }
         .report-summary.negative .daily-result { border-color: var(--red); }
         .daily-result .label { font-size: 16px; color: var(--text-secondary); }
-        .daily-result .value { font-size: 24px; font-weight: 700; color: var(--text-primary); transition: color 0.3s ease; }
+        .daily-result .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
         .report-summary.positive .value { color: var(--green); }
         .report-summary.negative .value { color: var(--red); }
 
-
-        /* Estilo do botão de Upload no estado pós-carregamento */
         .upload-section {
-            display: flex; /* Torna a seção de upload um flexbox */
-            justify-content: center; /* <<< MUDANÇA AQUI: Centraliza o botão */
-            width: 100%; /* Garante que ocupe a largura disponível para o justify-content funcionar */
-            margin-top: -15px; /* Margem original do botão */
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: -15px;
         }
         .file-input { display: none; }
         .file-input-label {
@@ -183,17 +207,17 @@
             font-weight: 700;
             text-align: center;
             border: none;
-            width: fit-content; /* Ocupa apenas o espaço necessário */
+            width: fit-content;
         }
         .file-input-label:hover { transform: scale(1.05); box-shadow: 0 0 25px var(--green-glow); }
 
         /* --- Conteúdo Principal (Robô Cards) --- */
         .main-content {
-            flex-grow: 1; /* Ocupa o espaço restante */
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             gap: 25px;
-            transition: all 0.5s ease-in-out; /* Transição suave */
+            transition: all 0.5s ease-in-out;
         }
 
         .main-grid {
@@ -223,32 +247,64 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .robot-card { background-color: var(--surface); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px; display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease; opacity: 0; animation: fadeInUp 0.5s ease forwards; }
-        .robot-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); }
+        .robot-card {
+            background-color: var(--surface);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        .robot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
         .robot-card.positive { border-color: var(--green); }
         .robot-card.positive:hover { box-shadow: 0 0 25px var(--green-glow); }
         .robot-card.neutral { border-color: var(--border-color); }
         .robot-card.negative { border-color: var(--red); }
 
-        .card-header { display: flex; align-items: center; gap: 12px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-        .status-dot { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .status-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
         .status-dot.green { background-color: var(--green); }
         .status-dot.grey { background-color: var(--text-secondary); }
         .status-dot.red { background-color: var(--red); }
 
         .robot-logo {
-            max-width: 40px; /* Largura máxima aumentada */
-            max-height: 40px; /* Altura máxima aumentada */
-            height: auto; /* Mantém a proporção */
-            width: auto; /* Mantém a proporção */
-            object-fit: contain; /* Garante que a imagem se ajuste sem ser cortada */
-            margin-left: auto; /* Joga a logo para a direita */
-            padding: 2px; /* Adiciona um pequeno padding interno à área do logo, se necessário */
+            max-width: 40px;
+            max-height: 40px;
+            height: auto;
+            width: auto;
+            object-fit: contain;
+            margin-left: auto;
+            padding: 2px;
         }
 
         .title-group { flex-grow: 1; }
-        .title-group h3 { font-size: 22px; font-weight: 600; }
-        .title-group .margem { font-size: 12px; color: var(--text-secondary); }
+        .title-group h3 {
+            font-family: var(--font-family-secondary); /* Aplica a fonte Orbitron */
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .title-group .margem {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
 
         .card-body { padding-top: 10px; flex-grow: 1; }
         .trades-table { width: 100%; border-collapse: collapse; }
@@ -259,7 +315,15 @@
         .trades-table td.profit { color: var(--green); }
         .trades-table td.loss { color: var(--red); }
 
-        .card-footer { border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: auto; display: flex; justify-content: space-between; font-size: 14px; font-weight: 500; }
+        .card-footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 500;
+        }
         .card-footer .result.positive { color: var(--green); }
         .card-footer .result.negative { color: var(--red); }
         .card-footer .result.neutral { color: var(--text-primary); }
@@ -267,24 +331,23 @@
         /* --- Layout Responsivo --- */
         @media (max-width: 1200px) { .main-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 992px) {
-            /* No responsivo, a sidebar e o main-content devem empilhar */
             .report-wrapper:not(.initial-state) {
                 flex-direction: column;
-                align-items: center; /* Centraliza tudo ao centro no mobile */
+                align-items: center;
             }
             .report-wrapper:not(.initial-state) .sidebar {
                 position: static;
                 flex-basis: auto;
                 width: 100%;
                 max-width: 500px;
-                align-items: center; /* Centraliza conteúdo da sidebar no responsivo */
-                text-align: center; /* Centraliza texto no responsivo */
-                margin-bottom: 40px; /* Adiciona espaço abaixo da sidebar */
+                align-items: center;
+                text-align: center;
+                margin-bottom: 40px;
             }
-            .report-wrapper:not(.initial-state) .logo { justify-content: center; } /* Centraliza logo no responsivo */
+            .report-wrapper:not(.initial-state) .logo { justify-content: center; }
             .report-wrapper:not(.initial-state) .main-content { width: 100%; }
-            .report-wrapper:not(.initial-state) .upload-section { justify-content: center; } /* Centraliza o botão no responsivo */
-            .report-wrapper:not(.initial-state) .report-summary .daily-result { margin: 0 auto; } /* Centraliza o resultado no responsivo */
+            .report-wrapper:not(.initial-state) .upload-section { justify-content: center; }
+            .report-wrapper:not(.initial-state) .report-summary .daily-result { margin: 0 auto; }
         }
         @media (max-width: 768px) {
             .main-grid { grid-template-columns: 1fr; }
@@ -302,14 +365,14 @@
                 <img src="https://i.ibb.co/jswt9pR/LOGO-XTRADERS-Intelligence-1-1.png" alt="XTRADERS Intelligence Logo">
             </div>
             <div class="report-summary" id="report-summary">
-                <h2>RELATÓRIO</h2>
+                <h2 id="report-title">RELATÓRIO</h2>
                 <p class="date" id="summary-date">--/--/----</p>
                 <div class="daily-result">
                     <div class="label">Resultado Automações:</div>
                     <div class="value" id="summary-result">R$ 0,00</div>
                 </div>
             </div>
-             <div class="upload-section">
+            <div class="upload-section">
                 <label for="reportFile" class="file-input-label">Carregar Relatório</label>
                 <input type="file" id="reportFile" class="file-input" accept=".csv">
             </div>
@@ -319,7 +382,7 @@
             <main class="main-grid" id="main-grid"></main>
 
             <section class="manual-trades-section" id="manual-trades-section" style="display: none;">
-                <h2>Operações na Mão</h2>
+                <h2 id="manual-trades-title">Operações na Mão</h2>
                 <div id="manual-trades-container"></div>
             </section>
         </div>
@@ -334,18 +397,19 @@
 
         const ALL_ROBOTS = [
             { name: 'ATRION WIN', margem: 'Margem 50k: 5 contratos WDO', logoUrl: 'https://i.ibb.co/Gfn4rkTx/ATRION-WIN.png' },
-            { name: 'ATRION WDO', margem: 'Margem 50k: 10 contratos WIN', logoUrl: 'https://i.ibb.co/Gfn4rkTx/ATRION-WIN.png' },
+            { name: 'ATRION WDO', margem: 'Margem 50k: 10 contratos WIN', logoUrl: 'https://i.ibb.co/Gfn4rkTx/ATRION-WIN.png' }, // Logomarca pode ser a mesma se for o caso
             { name: 'CRONOS WDO', margem: 'Margem 50k: 5 contratos WDO', logoUrl: 'https://i.ibb.co/ynrKMFFj/CRONOS.png' },
             { name: 'ORION WIN', margem: 'Margem 50k: 10 contratos WIN', logoUrl: 'https://i.ibb.co/GgN9Q1h/ORION.png' },
             { name: 'ZARION', margem: 'Margem 50k: 10 contratos WIN', logoUrl: 'https://i.ibb.co/MD7sk6Tm/ZARION.png' },
-            { name: 'GIRION', margem: 'N/A', logoUrl: '' },
+            { name: 'GIRION', margem: 'N/A', logoUrl: '' }, // Mantido para caso de uso futuro, mas sem logo e margem específica
             { name: 'OPERAÇÕES NA MÃO', margem: 'Manual', logoUrl: null }
         ];
 
-        const ROBOTS_WITH_PARTIALS = ['ATRION WIN', 'ORION WIN'];
+        const ROBOTS_WITH_PARTIALS = ['ATRION WIN', 'ORION WIN']; // Robôs que podem ter entradas parciais
 
         fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0]; if (!file) return;
+            const file = event.target.files[0];
+            if (!file) return;
 
             // Remove a classe "initial-state" para mudar o layout
             reportWrapper.classList.remove('initial-state');
@@ -353,10 +417,10 @@
 
             const reader = new FileReader();
             reader.onload = (e) => processDetailedCSV(e.target.result);
-            reader.readAsText(file, 'windows-1252');
+            reader.readAsText(file, 'windows-1252'); // Codificação comum para CSV brasileiro
         });
 
-        // --- FUNÇÃO PRINCIPAL DE PROCESSAMENTO (ATUALIZADA) ---
+        // --- FUNÇÃO PRINCIPAL DE PROCESSAMENTO DO CSV ---
         function processDetailedCSV(csvText) {
             try {
                 const lines = csvText.trim().split('\n');
@@ -365,98 +429,122 @@
                 const headers = lines.shift().split(';').map(h => h.trim());
                 const colIndices = {};
                 headers.forEach((h, i) => { colIndices[h] = i; });
-                const robotNameKey = Object.keys(colIndices).find(k => k.toUpperCase().includes('ROBO') || k.toUpperCase().includes('ROBÔ'));
-                if (!robotNameKey) throw new Error("Coluna 'ROBÔ' não encontrada no arquivo.");
 
-                // 1. Lê todas as linhas e converte para objetos
+                // Tenta encontrar a coluna 'ROBÔ' ou 'ROBO' de forma case-insensitive e com possível variação
+                const robotNameKey = Object.keys(colIndices).find(k => k.toUpperCase().includes('ROBO') || k.toUpperCase().includes('ROBÔ'));
+                if (!robotNameKey) throw new Error("Coluna 'ROBÔ' ou 'ROBO' não encontrada no arquivo. Verifique o cabeçalho do CSV.");
+
                 let rawTrades = [];
                 let reportDate = '';
+
                 lines.forEach(line => {
-                    if (line.trim() === "") return;
+                    if (line.trim() === "") return; // Ignora linhas vazias
                     const values = line.split(';');
-                    if (!reportDate && values[colIndices['DATA']]) { reportDate = values[colIndices['DATA']]; }
+
+                    // Tenta extrair a data da primeira linha válida (assumindo que está na coluna 'DATA')
+                    if (!reportDate && values[colIndices['DATA']]) {
+                        reportDate = values[colIndices['DATA']];
+                    }
 
                     const robotName = values[colIndices[robotNameKey]]?.trim();
-                    if(robotName){
+
+                    // Processa apenas se a linha tiver um nome de robô válido
+                    if (robotName) {
                         rawTrades.push({
                             robotName: robotName,
-                            operacao: values[colIndices['OPERAÇÃO']],
-                            horaEntrada: values[colIndices['HORA ENTRADA']],
-                            horaSaida: values[colIndices['HORA SAÍDA']],
-                            precoEntrada: values[colIndices['PREÇO ENTRADA']],
-                            precoSaida: values[colIndices['PREÇO SAÍDA']],
-                            contratos: parseFloat(values[colIndices['CONTRATOS']]?.replace(',', '.') || 0),
-                            resultado: parseFloat(values[colIndices['RESULTADO']]?.replace(',', '.') || 0),
+                            operacao: values[colIndices['OPERAÇÃO']] || '',
+                            horaEntrada: values[colIndices['HORA ENTRADA']] || '',
+                            horaSaida: values[colIndices['HORA SAÍDA']] || '',
+                            precoEntrada: values[colIndices['PREÇO ENTRADA']] || '',
+                            precoSaida: values[colIndices['PREÇO SAÍDA']] || '',
+                            contratos: parseFloat(values[colIndices['CONTRATOS']]?.replace(',', '.') || '0'),
+                            resultado: parseFloat(values[colIndices['RESULTADO']]?.replace(',', '.') || '0'),
                         });
                     }
                 });
 
-                // 2. Agrupa as operações com parciais
+                // 1. Agrupa trades com parciais
                 const processedTrades = groupTradesWithPartials(rawTrades);
 
-                // 3. Preenche a estrutura de dados final
+                // 2. Preenche a estrutura de dados final para todos os robôs
                 let reportData = {};
-                ALL_ROBOTS.forEach(robot => { reportData[robot.name] = { ...robot, trades: [] }; });
+                ALL_ROBOTS.forEach(robot => {
+                    // Cria uma entrada para cada robô, mesmo que não tenha trades no CSV
+                    reportData[robot.name] = { ...robot, trades: [] };
+                });
 
+                // Adiciona os trades processados à estrutura reportData
                 processedTrades.forEach(trade => {
                     if (reportData[trade.robotName]) {
                         reportData[trade.robotName].trades.push(trade);
+                    } else {
+                        // Se o robô não está na lista ALL_ROBOTS mas aparece no CSV, adiciona ele
+                        reportData[trade.robotName] = {
+                            name: trade.robotName,
+                            margem: 'N/A', // Margem desconhecida para robôs não listados
+                            logoUrl: null, // Sem logo definido
+                            trades: [trade]
+                        };
                     }
                 });
 
-                // 4. Renderiza o dashboard
+                // 3. Renderiza o dashboard
                 updateSidebarSummary(reportData, reportDate);
                 renderCards(reportData);
 
             } catch (error) {
                 alert(`Erro ao processar o arquivo: ${error.message}`);
                 console.error(error);
-                // Em caso de erro, pode ser útil voltar ao estado inicial ou mostrar uma mensagem de erro mais proeminente
+                // Em caso de erro, volta ao estado inicial para permitir novo upload
                 reportWrapper.classList.add('initial-state');
                 mainContent.style.display = 'none';
             }
         }
 
-        // --- NOVA FUNÇÃO PARA AGRUPAR TRADES COM PARCIAIS ---
+        // --- FUNÇÃO PARA AGRUPAR TRADES COM PARCIAIS ---
+        // Esta função identifica trades que pertencem a uma mesma operação (baseado em robô e hora de entrada)
+        // e agrupa as parciais e o resultado final.
         function groupTradesWithPartials(rawTrades) {
             const finalTrades = [];
-            const tradeGroups = {}; // { 'ATRION WIN_09:19:43': [trade1, trade2], ... }
+            const tradeGroups = {}; // Armazena grupos de trades: { 'NomeRobo_HoraEntrada': [trade1, trade2], ... }
 
-            // Separa os trades que podem ter parciais dos que não tem
+            // Separa os trades: aqueles que podem ter parciais e os que não podem (simples)
             rawTrades.forEach(trade => {
+                // Verifica se o robô está na lista que suporta parciais
                 if (ROBOTS_WITH_PARTIALS.includes(trade.robotName)) {
-                    const key = `${trade.robotName}_${trade.horaEntrada}`;
+                    const key = `${trade.robotName}_${trade.horaEntrada}`; // Chave única para agrupar trades da mesma entrada
                     if (!tradeGroups[key]) {
                         tradeGroups[key] = [];
                     }
                     tradeGroups[key].push(trade);
                 } else {
-                    finalTrades.push(trade); // Adiciona trades simples diretamente
+                    finalTrades.push(trade); // Trades sem parciais são adicionados diretamente
                 }
             });
 
-            // Processa e agrega os grupos com parciais
+            // Processa e agrega os grupos de trades com parciais
             for (const key in tradeGroups) {
                 const group = tradeGroups[key];
 
-                // Ordena pela hora de saída para identificar a primeira (parcial) e a última
+                // Ordena os trades do grupo pela hora de saída para identificar a primeira (parcial) e a última (saída final)
                 group.sort((a, b) => a.horaSaida.localeCompare(b.horaSaida));
 
                 if (group.length === 1) {
-                    // Se só tem 1, é um trade normal, não tem parcial
+                    // Se há apenas um trade no grupo, ele não é uma parcial, é um trade normal
                     finalTrades.push(group[0]);
                 } else {
-                    const firstTrade = group[0];
-                    const lastTrade = group[group.length - 1];
+                    const firstTrade = group[0]; // O primeiro trade (menor hora de saída) é a parcial
+                    const lastTrade = group[group.length - 1]; // O último trade é a saída final
 
                     finalTrades.push({
                         robotName: firstTrade.robotName,
                         operacao: firstTrade.operacao,
+                        horaEntrada: firstTrade.horaEntrada,
                         precoEntrada: firstTrade.precoEntrada,
                         // Formata a parcial como "PREÇO(CONTRATOS)"
                         parcial: `${firstTrade.precoSaida}(${firstTrade.contratos})`,
-                        precoSaida: `${lastTrade.precoSaida}(${lastTrade.contratos})`,
-                        // Soma o resultado de todos os trades do grupo
+                        precoSaida: `${lastTrade.precoSaida}(${lastTrade.contratos})`, // Mostra o preço e contratos da última saída
+                        // Soma o resultado de todos os trades do grupo para obter o resultado total da operação
                         resultado: group.reduce((sum, t) => sum + t.resultado, 0)
                     });
                 }
@@ -464,15 +552,20 @@
             return finalTrades;
         }
 
-
+        // --- ATUALIZA O SUMÁRIO NA SIDEBAR ---
         function updateSidebarSummary(reportData, reportDate) {
             const summaryContainer = document.getElementById('report-summary');
             const dateEl = document.getElementById('summary-date');
             const resultEl = document.getElementById('summary-result');
+            const reportTitle = document.getElementById('report-title');
 
+            // Formata a data para DD/MM/AAAA
             dateEl.textContent = reportDate ? reportDate.split('.').reverse().join('/') : '--/--/----';
+            // Tenta aplicar a fonte Orbitron ao título principal
+            reportTitle.style.fontFamily = "var(--font-family-secondary)";
 
             let automationTotalResult = 0;
+            // Calcula o total de resultado das automações (excluindo "OPERAÇÕES NA MÃO")
             for (const robotName in reportData) {
                 if (robotName !== 'OPERAÇÕES NA MÃO') {
                     reportData[robotName].trades.forEach(trade => {
@@ -483,75 +576,116 @@
 
             resultEl.textContent = formatCurrency(automationTotalResult);
 
-            summaryContainer.className = 'report-summary';
+            // Atualiza a classe CSS para definir a cor do resumo (positivo/negativo/neutro)
+            summaryContainer.className = 'report-summary'; // Reseta as classes
             if (automationTotalResult > 0) summaryContainer.classList.add('positive');
             else if (automationTotalResult < 0) summaryContainer.classList.add('negative');
         }
 
+        // --- RENDERIZA OS CARDS DE CADA ROBÔ ---
         function renderCards(data) {
             const autoContainer = document.getElementById('main-grid');
             const manualContainer = document.getElementById('manual-trades-container');
             const manualSection = document.getElementById('manual-trades-section');
+            const manualTradesTitle = document.getElementById('manual-trades-title');
+
+            // Limpa os contêineres antes de renderizar novamente
             autoContainer.innerHTML = '';
             manualContainer.innerHTML = '';
-            manualSection.style.display = 'none';
+            manualSection.style.display = 'none'; // Esconde a seção manual por padrão
 
             let animationDelay = 0;
-            const sortedRobots = Object.values(data).sort((a, b) => (a.name === 'OPERAÇÕES NA MÃO') - (b.name === 'OPERAÇÕES NA MÃO'));
+            // Ordena os robôs para que 'OPERAÇÕES NA MÃO' apareça por último, se existir
+            const sortedRobots = Object.values(data).sort((a, b) => {
+                if (a.name === 'OPERAÇÕES NA MÃO') return 1;
+                if (b.name === 'OPERAÇÕES NA MÃO') return -1;
+                return 0;
+            });
 
             sortedRobots.forEach((roboData) => {
+                // Incrementa o delay para criar um efeito cascata na animação
                 animationDelay += 100;
                 const totalResult = roboData.trades.reduce((sum, trade) => sum + trade.resultado, 0);
 
+                // Define as classes CSS para o card com base no resultado
                 let cardStateClass = 'neutral';
-                let dotStateClass = 'grey';
-                if(roboData.trades.length > 0){
+                let dotStateClass = 'grey'; // Ponto de status padrão
+                if(roboData.trades.length > 0){ // Só define cores se houver trades
                     if (totalResult > 0) { cardStateClass = 'positive'; dotStateClass = 'green'; }
                     else if (totalResult < 0) { cardStateClass = 'negative'; dotStateClass = 'red'; }
                 }
 
-                let tradesHtml = roboData.trades.map(trade => {
-                    const opType = trade.operacao === 'COMPRA' ? 'C' : 'V';
-                    const resultClass = trade.resultado >= 0 ? 'profit' : 'loss';
-                    const partialHtml = ROBOTS_WITH_PARTIALS.includes(roboData.name) ? `<td>${trade.parcial || '-'}</td>` : '<td>-</td>';
+                let tradesHtml = '';
+                // Cria o HTML para cada trade dentro da tabela
+                if (roboData.trades.length > 0) {
+                    tradesHtml = roboData.trades.map(trade => {
+                        const opType = trade.operacao === 'COMPRA' ? 'C' : 'V';
+                        const resultClass = trade.resultado >= 0 ? 'profit' : 'loss';
+                        // Define o HTML para a coluna 'Parcial' condicionalmente
+                        const partialHtml = ROBOTS_WITH_PARTIALS.includes(roboData.name) ? `<td>${trade.parcial || '-'}</td>` : '<td>-</td>'; // Se não tem parciais, mostra traço
 
-                    return `
-                        <tr>
-                            <td class="op-${opType.toLowerCase()}">${opType}</td>
-                            <td>${trade.precoEntrada}</td>
-                            ${partialHtml}
-                            <td>${trade.precoSaida}</td>
-                            <td class="${resultClass}">${formatCurrency(trade.resultado)}</td>
-                        </tr>`;
-                }).join('');
-
-                if (roboData.trades.length === 0) {
+                        return `
+                            <tr>
+                                <td class="op-${opType.toLowerCase()}">${opType}</td>
+                                <td>${trade.precoEntrada}</td>
+                                ${partialHtml}
+                                <td>${trade.precoSaida}</td>
+                                <td class="${resultClass}">${formatCurrency(trade.resultado)}</td>
+                            </tr>`;
+                    }).join('');
+                } else {
+                    // Mensagem para quando não há operações
                     tradesHtml = `<tr><td colspan="5" style="text-align:center; color: var(--text-secondary); padding: 2rem 0;">Nenhuma operação no dia</td></tr>`;
                 }
 
+                // Cria o HTML para a logomarca do robô, se disponível
                 const logoHtml = roboData.logoUrl
                     ? `<img src="${roboData.logoUrl}" alt="${roboData.name} Logo" class="robot-logo">`
                     : '';
 
+                // Cria o elemento do card do robô
                 const card = document.createElement('div');
                 card.className = `robot-card ${cardStateClass}`;
-                card.style.animationDelay = `${animationDelay}ms`;
+                card.style.animationDelay = `${animationDelay}ms`; // Aplica o delay da animação
+
                 card.innerHTML = `
                     <div class="card-header">
                         <span class="status-dot ${dotStateClass}"></span>
-                        <div class="title-group"><h3>${roboData.name}</h3><p class="margem">${roboData.margem}</p></div>
+                        <div class="title-group">
+                            <h3 style="font-family: var(--font-family-secondary);">${roboData.name}</h3>
+                            <p class="margem">${roboData.margem}</p>
+                        </div>
                         ${logoHtml}
                     </div>
-                    <div class="card-body"><table class="trades-table"><thead><tr><th></th><th>Entrada</th><th>Parcial</th><th>Saída</th><th>Resultado</th></tr></thead><tbody>${tradesHtml}</tbody></table></div>
+                    <div class="card-body">
+                        <table class="trades-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Entrada</th>
+                                    <th>Parcial</th>
+                                    <th>Saída</th>
+                                    <th>Resultado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tradesHtml}
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="card-footer">
                         <span>QTD. OP: ${roboData.trades.length}</span>
                         <span class="result ${cardStateClass}">${formatCurrency(totalResult)}</span>
                     </div>`;
 
+                // Adiciona o card ao contêiner apropriado (automação ou manual)
                 if (roboData.name === 'OPERAÇÕES NA MÃO') {
                     manualContainer.appendChild(card);
+                    // Se houver operações manuais, torna a seção visível
                     if (roboData.trades.length > 0) {
-                       manualSection.style.display = 'flex';
+                        manualSection.style.display = 'flex';
+                        // Tenta aplicar a fonte Orbitron ao título das operações manuais
+                        manualTradesTitle.style.fontFamily = "var(--font-family-secondary)";
                     }
                 } else {
                     autoContainer.appendChild(card);
